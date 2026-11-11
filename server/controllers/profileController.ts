@@ -34,7 +34,7 @@ export async function publicNiche(req: Request, res: Response) {
   if (!niche) return res.status(404).json({ success: false, error: "Collection not found" });
   await countUniqueVisitor(niche._id, req);
   niche.uniqueVisitorCount = (niche.uniqueVisitorCount || 0) + 1;
-  const links = await ProductLink.find({ userId: user._id, nicheSegmentId: niche._id }).sort({ displayOrder: 1 });
+  const links = await ProductLink.find({ userId: user._id, nicheSegmentId: niche._id }).sort({ createdAt: -1, _id: -1 });
   return res.json({ success: true, data: { user, niche, links } });
 }
 export async function publicNicheByShareSlug(req: Request, res: Response) {
@@ -44,7 +44,7 @@ export async function publicNicheByShareSlug(req: Request, res: Response) {
   niche.uniqueVisitorCount = (niche.uniqueVisitorCount || 0) + 1;
   const user = await User.findById(niche.userId).select("username profile");
   if (!user) return res.status(404).json({ success: false, error: "Creator not found" });
-  const links = await ProductLink.find({ userId: user._id, nicheSegmentId: niche._id }).sort({ displayOrder: 1 });
+  const links = await ProductLink.find({ userId: user._id, nicheSegmentId: niche._id }).sort({ createdAt: -1, _id: -1 });
   return res.json({ success: true, data: { user, niche, links } });
 }
 export async function publicClick(req: Request, res: Response) { const link = await ProductLink.findByIdAndUpdate(req.params.id, { $inc: { clickCount: 1 } }, { new: true }); if (!link) return res.status(404).json({ success: false, error: "Product link not found" }); return res.json({ success: true, data: { selarUrl: link.selarUrl } }); }
